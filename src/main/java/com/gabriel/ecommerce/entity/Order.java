@@ -1,5 +1,6 @@
 package com.gabriel.ecommerce.entity;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -28,9 +29,9 @@ public class Order {
     @Field(type = FieldType.Keyword, name = "status")
     private OrderStatus status;
 
-    @Field(type = FieldType.Date, name = "created_at")
+    @Field(type = FieldType.Date, name = "created_at", format = DateFormat.date_hour_minute_second)
     private LocalDateTime createdAt;
-
-    @Field(type = FieldType.Date, name = "updated_at")
+    
+    @Field(type = FieldType.Date, name = "updated_at", format = DateFormat.date_hour_minute_second)
     private LocalDateTime updatedAt;
 }

@@ -11,15 +11,7 @@ import com.gabriel.ecommerce.entity.dto.AverageTicketDTO;
 import com.gabriel.ecommerce.entity.dto.TopUserDTO;
 
 public interface OrderSummaryRepository extends JpaRepository<OrderSummary, String> {
-    @Query(value = """
-        SELECT user_id AS userId, SUM(total_amount) AS totalSpent
-        FROM order_summary
-        WHERE paid = TRUE
-        GROUP BY user_id
-        ORDER BY totalSpent DESC
-        LIMIT 5
-        """, nativeQuery = true)
-    List<TopUserDTO> findTop5UsersByTotalSpent();
+    List<TopUserDTO> findTop5ByPaidTrueOrderByTotalAmountDesc();
 
     @Query(value = """
         SELECT user_id AS userId, AVG(total_amount) AS averageTicket
@@ -28,15 +20,6 @@ public interface OrderSummaryRepository extends JpaRepository<OrderSummary, Stri
         """, nativeQuery = true)
     List<AverageTicketDTO> findAverageTicketPerUser();
 
-    @Query(value = """
-        SELECT SUM(total_amount) AS total_revenue
-        FROM order_summary
-        WHERE paid = TRUE
-          AND MONTH(created_at) = :month
-          AND YEAR(created_at) = :year
-        """, nativeQuery = true)
-    Double findTotalRevenueByMonthAndYear(
-        @Param("month") int month,
-        @Param("year") int year
-    );
+    @Query("SELECT SUM(os.totalAmount) FROM OrderSummary os WHERE os.paid = TRUE AND MONTH(os.createdAt) = :month AND YEAR(os.createdAt) = :year")
+    Double findTotalRevenueByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }

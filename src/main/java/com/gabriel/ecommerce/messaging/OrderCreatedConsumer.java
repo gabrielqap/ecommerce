@@ -21,6 +21,7 @@ public class OrderCreatedConsumer {
         orderSummary.setUserId(event.getUserId());
         orderSummary.setTotalAmount(totalAmount);
         orderSummary.setCreatedAt(event.getCreatedAt());
+        orderSummary.setPaid(false);
 
         orderSummaryRepository.save(orderSummary);
     }

@@ -71,9 +71,12 @@ public class PaymentService {
             Product product = productRepository.findById(item.getProductId())
                     .orElseThrow(() -> new ProductNotFoundException("Product not found: " + item.getProductId()));
 
-            if (product.getStock() < item.getQuantity()) {
-                throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
-            }
+                    if (product.getStock() < item.getQuantity()) {
+                        throw new InsufficientStockException(
+                            "Insufficient stock for product: " + product.getName() + ". The order has been canceled."
+                        );
+                    }
+                    
         }
     }
 

@@ -1,18 +1,14 @@
 package com.gabriel.ecommerce.service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 
 import com.gabriel.ecommerce.entity.Product;
 import com.gabriel.ecommerce.exception.ProductNotFoundException;
+import com.gabriel.ecommerce.repository.OrderRepository;
 import com.gabriel.ecommerce.repository.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -20,7 +16,7 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private OrderRepository orderRepository;
 
     public Product indexProduct(Product product) {
         return productRepository.save(product);
@@ -34,29 +30,6 @@ public class ProductService {
                 maxPrice,
                 0
         );
-    }
-
-    public List<Product> searchProducts_(String name, String category, Double minPrice, Double maxPrice) {
-        Criteria criteria = new Criteria();
-
-        
-        if (name != null) {
-            criteria.and("name").is(name);
-        }
-        if (category != null) {
-            criteria.and("category").is(category);
-        }
-        if (minPrice != null && maxPrice != null) {
-            criteria.and("price").between(minPrice, maxPrice);
-        }
-        
-        criteria.and("stock").greaterThan(0);
-        
-        CriteriaQuery query = new CriteriaQuery(criteria);
-        return elasticsearchOperations.search(query, Product.class)
-                .stream()
-                .map(SearchHit::getContent)
-                .collect(Collectors.toList());
     }
 
     public void updateStock(String productId, Integer quantitySold) {
@@ -110,6 +83,13 @@ public class ProductService {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException("Product not found with ID: " + id);
         }
+        
+        long orderCount = orderRepository.countByProductId(id);
+
+        if (orderCount > 0) {
+            throw new IllegalStateException("Cannot delete product with ID " + id + " because it is associated with " + orderCount + " orders.");
+        }
+
         productRepository.deleteById(id);
     }
 

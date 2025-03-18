@@ -13,27 +13,23 @@ public interface ProductRepository extends ElasticsearchRepository<Product, Stri
     {
       "bool": {
         "must": [
-          #{
-            if (#name != null) {
-              {'match': {'name': '?0'}}
+          { "match": { "name": "?0" } },
+          { "match": { "category": "?1" } }
+        ],
+        "filter": [
+          {
+            "range": {
+              "price": {
+                "gte": "?2",
+                "lte": "?3"
+              }
             }
           },
-          #{
-            if (#category != null) {
-              {'match': {'category': '?1'}}
-            }
-          },
-          #{
-            if (#minPrice != null || #maxPrice != null) {
-              {'range': {'price': {
-                #{if (#minPrice != null) {'gte': ?2}},
-                #{if (#maxPrice != null) {'lte': ?3}}
-              }}}
-            }
-          },
-          #{
-            if (#stock != null) {
-              {'range': {'stock': {'gt': ?4}}}
+          {
+            "range": {
+              "stock": {
+                "gt": "?4"
+              }
             }
           }
         ]

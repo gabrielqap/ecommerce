@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                                 // ADMIN-only routes
                                 .requestMatchers(HttpMethod.POST, "/products").hasRole("ADMIN") // Create product
                                 .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN") // Update product
+                                .requestMatchers(HttpMethod.PATCH, "/products/**").hasRole("ADMIN") // Update product
                                 .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN") // Delete product
 
                                 // USER-only routes

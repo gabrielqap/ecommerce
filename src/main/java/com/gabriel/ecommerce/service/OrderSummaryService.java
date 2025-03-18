@@ -17,7 +17,7 @@ public class OrderSummaryService {
     private OrderSummaryRepository orderSummaryRepository;
 
     public List<TopUserDTO> getTop5UsersByTotalSpent() {
-        return orderSummaryRepository.findTop5UsersByTotalSpent();
+        return orderSummaryRepository.findTop5ByPaidTrueOrderByTotalAmountDesc();
     }
 
     public List<AverageTicketDTO> getAverageTicketPerUser() {
