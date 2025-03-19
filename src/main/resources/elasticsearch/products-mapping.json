@@ -1,0 +1,17 @@
+{
+    "properties": {
+      "name": {
+        "type": "text",
+        "analyzer": "name_analyzer"
+      },
+      "description": {
+        "type": "text"
+      },
+      "price": {
+        "type": "float"
+      },
+      "category": {
+        "type": "keyword"
+      }
+    }
+  }
