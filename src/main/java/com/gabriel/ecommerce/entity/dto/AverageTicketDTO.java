@@ -1,6 +1,6 @@
 package com.gabriel.ecommerce.entity.dto;
 
 public record AverageTicketDTO(
-    String userId,
+    String username,
     Double averageTicket
 ) {}

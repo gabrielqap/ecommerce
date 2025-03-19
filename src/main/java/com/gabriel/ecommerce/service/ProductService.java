@@ -1,5 +1,9 @@
 package com.gabriel.ecommerce.service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 
 import com.gabriel.ecommerce.entity.Product;
@@ -9,6 +13,7 @@ import com.gabriel.ecommerce.repository.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -22,15 +27,32 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Autowired
+     private ElasticsearchOperations elasticsearchOperations;
+
     public List<Product> searchProducts(String name, String category, Double minPrice, Double maxPrice) {
-        return productRepository.searchProducts(
-                name,
-                category,
-                minPrice,
-                maxPrice,
-                0
-        );
-    }
+        Criteria criteria = new Criteria();
+        if (category != null) {
+            criteria = criteria.and("category").is(category);
+        }
+        if (name != null) {
+            criteria = criteria.and("name").is(name);
+        }
+        if (minPrice != null && maxPrice != null) {
+            criteria = criteria.and("price").between(minPrice, maxPrice);
+        } else if (minPrice != null) {
+            criteria = criteria.and("price").greaterThanEqual(minPrice);
+        } else if (maxPrice != null) {
+            criteria = criteria.and("price").lessThanEqual(maxPrice);
+        }
+         criteria = criteria.and("stock").greaterThan(0);
+         
+         CriteriaQuery query = new CriteriaQuery(criteria);
+         return elasticsearchOperations.search(query, Product.class)
+                 .stream()
+                 .map(SearchHit::getContent)
+                 .collect(Collectors.toList());
+     }
 
     public void updateStock(String productId, Integer quantitySold) {
         Product product = productRepository.findById(productId)

@@ -1,5 +1,7 @@
 package com.gabriel.ecommerce.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -18,6 +20,8 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String from;
 
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+
 
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -28,7 +32,8 @@ public class EmailService {
         try {
             javaMailSender.send(message);
         } catch (MailException e) {
-            throw new EmailSendingException("Falha ao enviar e-mail para: " + to, e);
+            logger.error("Failed to send email to:" + to);
+            throw new EmailSendingException("Failed to send email to:" + to, e);
         }
     }
 }

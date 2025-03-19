@@ -32,23 +32,22 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
                                 // ADMIN-only routes
-                                .requestMatchers(HttpMethod.POST, "/products").hasRole("ADMIN") // Create product
-                                .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN") // Update product
-                                .requestMatchers(HttpMethod.PATCH, "/products/**").hasRole("ADMIN") // Update product
-                                .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN") // Delete product
+                                .requestMatchers(HttpMethod.POST, "/products").hasRole("ADMIN") 
+                                .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/products/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
 
                                 // USER-only routes
-                                .requestMatchers(HttpMethod.POST, "/orders").hasRole("USER") // Create order
-                                .requestMatchers(HttpMethod.GET, "/products").hasRole("USER") // View products
-                                .requestMatchers(HttpMethod.POST, "/orders/{id}/payment").hasRole("USER") // Pay for order
+                                .requestMatchers(HttpMethod.POST, "/orders").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/orders/{id}/payment").hasAnyRole("USER", "ADMIN")
 
                                 // Search route (accessible by USER and ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/products/search").hasAnyRole("USER", "ADMIN") // Search products
+                                .requestMatchers(HttpMethod.GET, "/products/search").hasAnyRole("USER", "ADMIN")
 
                                 // Report routes (ADMIN-only)
-                                .requestMatchers(HttpMethod.GET, "/reports/top-customers").hasRole("ADMIN") // Top 5 users by purchases
-                                .requestMatchers(HttpMethod.GET, "/reports/average-ticket").hasRole("ADMIN") // Average ticket per user
-                                .requestMatchers(HttpMethod.GET, "/reports/monthly-revenue").hasRole("ADMIN") // Monthly revenue
+                                .requestMatchers(HttpMethod.GET, "/reports/top-customers").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/reports/average-ticket").hasRole("ADMIN") 
+                                .requestMatchers(HttpMethod.GET, "/reports/monthly-revenue").hasRole("ADMIN")
                             .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

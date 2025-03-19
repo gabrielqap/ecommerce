@@ -1,7 +1,7 @@
 package com.gabriel.ecommerce.enums;
 
 public enum Role {
-    ADMIN("admin"), USER("user");
+    ADMIN("ADMIN"), USER("USER");
 
     private final String role;
 

@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import com.gabriel.ecommerce.entity.User;
 
 @Service
 public class TokenService {
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     @Value("${api.security.token.secret}")
     private String secret;
@@ -29,6 +32,7 @@ public class TokenService {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException e) {
+            logger.error("Error while generating token");
             throw new RuntimeException("Error while generating token", e);
         }
     }

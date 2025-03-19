@@ -5,6 +5,10 @@ import com.gabriel.ecommerce.entity.Order;
 import com.gabriel.ecommerce.entity.dto.OrderCreatedEventDTO;
 import com.gabriel.ecommerce.messaging.OrderEventProducer;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
@@ -18,8 +22,18 @@ public class OrderEventService {
                 order.getId(),
                 order.getUserId(),
                 order.getItems(),
-                totalAmount
+                totalAmount,
+                convertLocalDateTimeToSqlDate(order.getCreatedAt())
         );
         orderEventProducer.sendOrderCreatedEvent(event);
+    }
+
+    public static Date convertLocalDateTimeToSqlDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        
+        LocalDate localDate = localDateTime.toLocalDate();
+        return Date.valueOf(localDate);
     }
 }

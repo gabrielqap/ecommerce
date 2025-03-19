@@ -1,6 +1,8 @@
 package com.gabriel.ecommerce.service;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.gabriel.ecommerce.repository.ProductRepository;
 
 @Service
 public class PaymentService {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     @Autowired
     private OrderRepository orderRepository;
@@ -37,7 +40,14 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
+        notificationService.notifyUser(
+            order.getUserId(),
+            order.getId(),
+            "Your order #" + order.getId() + " has been canceled due to insufficient stock."
+        );
+
         if (order.getStatus() != OrderStatus.PENDING) {
+            logger.error("Order " + orderId +" already processed or canceled.");
             throw new OrderAlreadyProcessedException("Order already processed or canceled.");
         }
 
@@ -55,7 +65,7 @@ public class PaymentService {
         } catch (InsufficientStockException e) {
             order.setStatus(OrderStatus.CANCELED);
             orderRepository.save(order);
-
+            logger.error("Order " + order.getId() + " has been canceled due to insufficient stock.");
             notificationService.notifyUser(
                 order.getUserId(),
                 order.getId(),
@@ -72,6 +82,7 @@ public class PaymentService {
                     .orElseThrow(() -> new ProductNotFoundException("Product not found: " + item.getProductId()));
 
                     if (product.getStock() < item.getQuantity()) {
+                        logger.error("Insufficient stock for product: " + product.getName() + ". The order has been canceled.");
                         throw new InsufficientStockException(
                             "Insufficient stock for product: " + product.getName() + ". The order has been canceled."
                         );
@@ -81,6 +92,6 @@ public class PaymentService {
     }
 
     public void process(){
-        System.out.println("Processing payment...");
+        logger.info("Processing payment...");
     }
 }

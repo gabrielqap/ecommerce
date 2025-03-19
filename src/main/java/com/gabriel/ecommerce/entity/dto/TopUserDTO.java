@@ -1,6 +1,6 @@
 package com.gabriel.ecommerce.entity.dto;
 
 public record TopUserDTO(
-    String userId,
+    String username,
     Double totalSpent
 ) {}
